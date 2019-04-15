@@ -1,0 +1,17 @@
+articles collection document schema:
+{
+    headline : headline,
+    summary : summary,
+    URL : URL,
+    author : author,
+    article thumbnail : thumbnail,
+    comments : [
+        {
+            text : "comment text",
+            author : "comment author"
+        }
+    ]
+}
+
+
+

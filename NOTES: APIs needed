@@ -1,0 +1,10 @@
+
+** comments should be stored in an array so that they can be identified by their position for API usage
+
+Get routes:
+/ << displays all results from database, sorted by date added (can build out pagination later, if desired)
+/review/{_id} << shows the comments for the article
+
+Post routes:
+/api/comment/{_id} << for new comment
+/api/comDelete/{_id}/{comment}
