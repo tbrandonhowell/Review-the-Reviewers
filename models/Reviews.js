@@ -16,6 +16,12 @@ const ReviewsSchema = new Schema ({
         type: Date,
         default: Date.now
     },
+    comments: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Comments"
+        }
+    ]
 });
 
 const Reviews = mongoose.model("Reviews",ReviewsSchema);

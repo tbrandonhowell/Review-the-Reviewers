@@ -1,0 +1,14 @@
+<h1>Review the Reviews</h1>
+
+<p>Read the latest reviews of reviews:</p>
+
+{{#each reviews}}
+<div style="border: 1px solid #000000">
+    <h4>{{this.artist}}: {{this.album}}</h4>
+    <p><em>&quot;{{this.snippet}}&quot;</em></p>
+    <p>by: {{this.author}}</p>
+    <p>Read <a href="/reviews/{{this._id}}">{{this.comments.length}} Review(s)</a></p>
+    <p><a href="/leave-review/{{this._id}}">Leave a Review of Review</a></p>
+</div>
+
+{{/each}}

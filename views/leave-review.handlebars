@@ -6,10 +6,28 @@
 
 <h2>Leave your review:</h2>
 
-<form>
-    <p>Your Name:</p>
-    <input>
-    <p>Your Review:</p>
-    <textarea></textarea>
 
-</form>
+    <p>Your Name:</p>
+    <input type="text" id="reviewName" name="reviewName">
+    <p>Your Review:</p>
+    <textarea id="reviewText" name="reviewText"></textarea>
+    <button id="subNewReview">Submit</button>
+
+
+<script>
+    $("#subNewReview").on("click",function(event){
+        $.post("/api/post-review",
+        { 
+            author: $("#reviewName").val().trim(), 
+            comment: $("#reviewText").val().trim(), 
+            id: "{{this._id}}", 
+        })
+        .then( () => {
+            console.log("we're in the .then()");
+            console.log("attemping to reload the page");
+            location.assign("/reviews/{{this.id}}");
+        })
+
+    })
+
+</script>

@@ -134,13 +134,22 @@ app.get("/", (req,res) => {
 
 // =================================
 // GET "/reviews" ROUTE - show all reviews with reviews
+// TODO: this needs to be finished. won't work at present b/c of the way I'm deleting comments instead of deleting comment IDs from articles/reviews
+app.get("/reviews", (req,res) => {
+    console.log("\n\n/reviews route requested");
+    db.Reviews.find({ comments: {$ne: [] } }) // TODO: filtering isn't working right b/c comments is empty, but still exists
+        .then(response => {
+            console.log(response);
+            res.render("reviews", {reviews: response});
+        })
+})
 // =================================
 
 // =================================
 // GET "/reviews/_id" ROUTE - show reviews of specific review
 app.get("/reviews/:id", (req,res) => {
     console.log("\n\n/reviews/:id route requested");
-    db.Reviews.findOne({_id: req.params.id})
+    db.Reviews.findOne({_id: req.params.id}).populate("comments")
         .then(response => {
             console.log(response);
             res.render("reviews-of-review", response);
@@ -162,6 +171,45 @@ app.get("/leave-review/:id", (req,res) => {
 
 // =================================
 // POST "/api/post-review" ROOT ROUTE - add a review
+app.post("/api/post-review", (req,res) => {
+    console.log("\n\n/api/post-review POST received");
+    db.Comments.create(req.body)
+        .then(newComment => {
+            console.log("new comment added:");
+            console.log(newComment);
+            return db.Reviews.findOneAndUpdate({_id: req.body.id},{ $push: { comments: newComment._id } }, {new: true});
+        })
+        .then(response => {
+            console.log(response);
+            return res.status(200).end(); // return a 200 server status if everything went okay.
+        })
+        .catch(err => {
+            res.json(err);
+        })
+});
+// =================================
+
+// =================================
+// POST "/api/post-review" ROOT ROUTE - add a review
+app.post("/api/drop-review", (req,res) => {
+    console.log("\n\n/api/drop-review POST received");
+    db.Reviews.update( {}, { $pull: { comments: req.body.id} })
+        .then(response => {
+            console.log(response);
+            return res.status(200).end(); // return a 200 server status if everything went okay.
+        })
+        .catch(err => {
+            res.json(err);
+        })
+    // db.Comments.deleteOne({_id: req.body.id})
+    //     .then(response => {
+    //         console.log(response);
+    //         return res.status(200).end(); // return a 200 server status if everything went okay.
+    //     })
+    //     .catch(err => {
+    //         res.json(err);
+    //     })
+});
 // =================================
 
 // =================================
