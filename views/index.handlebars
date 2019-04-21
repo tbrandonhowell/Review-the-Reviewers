@@ -1,0 +1,27 @@
+<h1>Review the Review</h1>
+
+<p>Leave a review of a pretentious review. Feel free to be pretentious yourself.</p>
+
+<h2>Latest Pitchfork Reviews:</h2>
+
+<div style="border: 1px solid #000000">
+    <h4>Artist: Album Name</h4>
+    <p>Snippet goes here.</p>
+    <p>by: Reviewer Name</p>
+    <p><a href="#">Read Original Review</a></p>
+    <p><a href="#">See Reviews of Review</a></p>
+    <p><a href="">Leave a Review of Review</a></p>
+</div>
+
+
+{{#each reviews}}
+<div style="border: 1px solid #000000">
+    <h4>{{this.artist}}: {{this.album}}</h4>
+    <p><em>&quot;{{this.snippet}}&quot;</em></p>
+    <p>by: {{this.author}}</p>
+    <p><a href="{{this.url}}">Read Original Review</a></p>
+    <p><a href="/reviews/{{this._id}}">See Reviews of Review</a></p>
+    <p><a href="/leave-review/{{this._id}}">Leave a Review of Review</a></p>
+</div>
+
+{{/each}}

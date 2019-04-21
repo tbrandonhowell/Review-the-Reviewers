@@ -1,0 +1,28 @@
+<h1>Review:</h1>
+
+    <h2>{{this.artist}}: {{this.album}}</h2>
+    <p><em>&quot;{{this.snippet}}&quot;</em></p>
+    <p>by: {{this.author}}</p>
+    <p><a href="{{this.url}}">Read Original Review</a></p>
+    <p><a href="/leave-review/{{this._id}}">Leave Your Own Review of This Review</a></p>
+
+
+<h2>Latest Reviews of This Review:</h2>
+
+<div style="border: 1px solid #000000">
+    <p>Review Reviewer: Bob Peterson</p>
+    <p>This is the review text.</p>
+</div>
+
+
+{{!-- {{#each reviews}}
+<div style="border: 1px solid #000000">
+    <h4>{{this.artist}}: {{this.album}}</h4>
+    <p><em>&quot;{{this.snippet}}&quot;</em></p>
+    <p>by: {{this.author}}</p>
+    <p><a href="{{this.url}}">Read Original Review</a></p>
+    <p><a href="/reviews/{{this._id}}">See Reviews of Review</a></p>
+    <p><a href="/leave-review/{{this._id}}">Leave a Review of Review</a></p>
+</div>
+
+{{/each}} --}}
