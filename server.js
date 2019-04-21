@@ -2,14 +2,10 @@
 // REQUIRE
 const express = require("express");
 const exphbs = require('express-handlebars');
-const mongojs = require("mongojs"); // TODO: I think this needs to go
 const mongoose = require("mongoose");
 const axios = require("axios");
 const cheerio = require("cheerio");
 // =================================
-
-
-
 
 // =================================
 // SERVER
@@ -19,36 +15,36 @@ app.engine('handlebars', exphbs({defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 app.use(express.static('public')); // establish public folder
 // TODO: 
-app.use(express.urlencoded({ extended: false })); // TODO: what does this do?
-app.use(express.json()); // TODO: what does this do?
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 // =================================
 
-
-// TODO: 
-// Define our routes
+// TODO: Define separate route files
 // app.use(require('./routes/htmlRoutes')(db));
 // app.use('/api', require('./routes/apiRoutes')(passport, db));
 // =================================
 
-
-
 // =================================
 // DATABASE
-// const databaseName = "mongoHomework";
-// const collectionNames = ["reviews"];
-// const db = mongojs(databaseName, collectionNames); // load the mongo database into the "db" variable
-// db.on("error", function(error) { // handle errors
-//     console.log("Database Error: ",error);
-// })
-// use mongoose instead:
 const db = require("./models");
 mongoose.connect("mongodb://localhost/mongoHomework", { useNewUrlParser: true });
 // =================================
 
 // =================================
-// FUNCTION: scrapeReviews()
+// FUNCTION: pullReviews()
+const pullReviews = (res) => {
+    db.Reviews.find({}) // TODO: need to update this to sort based on newest review in database
+        .then(response => {
+            console.log("reviews pulled from DB for print");
+            // console.log(response);
+            res.render("index", {reviews: response} );
+        }) 
+}
+// =================================
 
-const scrapeReviews = () => {
+// =================================
+// FUNCTION: scrapeReviews()
+const scrapeReviews = (res) => {
 
     axios.get("https://pitchfork.com/reviews/albums/").then(response => {
 
@@ -79,65 +75,53 @@ const scrapeReviews = () => {
             // console.log("author: " + author);
             newEntry.author = author;
 
-            console.log(newEntry);
+            // console.log(newEntry);
+
+            // GET THE SNIPPET & write to DB
+            axios.get(url).then(response => { // do a second axios call to the review URL and grab the snippet
+                const $ = cheerio.load(response.data);
+                newEntry.snippet = $("div.review-detail__abstract").children("p").text();
+                console.log("\n\nnewEntry:");
+                console.log(newEntry);
+                db.Reviews.create(newEntry)
+                    .then(inserted => {
+                        console.log("New review saved to DB:");
+                        console.log(inserted);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            });
         
-            // =================================
-            // WRITE newEntry TO DB
-
-            db.Reviews.create(newEntry)
-                .then(inserted => {
-                    console.log("New review saved to DB:");
-                    console.log(inserted.url);
-                    axios.get(inserted.url).then(response => { // do a second axios call to the review URL and grab the snippet
-                        const $ = cheerio.load(response.data);
-                        const snippet = $("div.review-detail__abstract").children("p").text();
-                        db.Reviews.update( { _id: inserted._id }, { snippet: snippet } )
-                            .then(updated => {
-                                console.log("Updated Entry:");
-                                console.log(updated);
-                            });
-                    });
-                })
-                .catch(err => {
-                    console.log(err);
-                })
-
-            // =================================
         }); // close cheerio loop through review divs
 
     }); // close axios .then()
-
     
+    res.send("Scrape Complete");
 }
-// =================================
-
-// =================================
-// GET "/just-scrape" INITIAL ROUTE TO JUST SCRAPE
-app.get("/just-scrape", (req,res) => {
-    scrapeReviews(); // run it
-    res.render("temp-scrape");
-    // res.send("Scrape Complete"); // TODO: this needs to actually wait until the scraping is done before it fires off
-});
 // =================================
 
 // =================================
 // GET "/" ROOT ROUTE
 app.get("/", (req,res) => {
     console.log("\n\nRoot Route requested.");
-    db.Reviews.find({}) // TODO: need to update this to sort based on newest review in database
-        .then(response => {
-            console.log(response);
-            res.render("index", {reviews: response} );
-        });
+    pullReviews(res);
+});
+// =================================
+
+// =================================
+// POST "/api/just-scrape" INITIAL ROUTE TO JUST SCRAPE
+app.post("/api/just-scrape", (req,res) => {
+    console.log("\n\nScrape API Trigger requested")
+    scrapeReviews(res)
 });
 // =================================
 
 // =================================
 // GET "/reviews" ROUTE - show all reviews with reviews
-// TODO: this needs to be finished. won't work at present b/c of the way I'm deleting comments instead of deleting comment IDs from articles/reviews
 app.get("/reviews", (req,res) => {
     console.log("\n\n/reviews route requested");
-    db.Reviews.find({ comments: {$ne: [] } }) // TODO: filtering isn't working right b/c comments is empty, but still exists
+    db.Reviews.find({ comments: {$ne: [] } })
         .then(response => {
             console.log(response);
             res.render("reviews", {reviews: response});
@@ -201,14 +185,6 @@ app.post("/api/drop-review", (req,res) => {
         .catch(err => {
             res.json(err);
         })
-    // db.Comments.deleteOne({_id: req.body.id})
-    //     .then(response => {
-    //         console.log(response);
-    //         return res.status(200).end(); // return a 200 server status if everything went okay.
-    //     })
-    //     .catch(err => {
-    //         res.json(err);
-    //     })
 });
 // =================================
 

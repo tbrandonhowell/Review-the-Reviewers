@@ -4,15 +4,9 @@
 
 <h2>Latest Pitchfork Reviews:</h2>
 
-<div style="border: 1px solid #000000">
-    <h4>Artist: Album Name</h4>
-    <p>Snippet goes here.</p>
-    <p>by: Reviewer Name</p>
-    <p><a href="#">Read Original Review</a></p>
-    <p><a href="#">See Reviews of Review</a></p>
-    <p><a href="">Leave a Review of Review</a></p>
-</div>
+<p>Reviews looking a little stale?</p>
 
+<button id="pullFreshReviews">Click to pull the latest Pitchfork Reviews</button>
 
 {{#each reviews}}
 <div style="border: 1px solid #000000">
@@ -25,3 +19,15 @@
 </div>
 
 {{/each}}
+
+<script>
+    $("#pullFreshReviews").on("click",function(event){
+        console.log("attempting to pull fresh reviews");
+        $.post("/api/just-scrape",{ },data => {
+            console.log("data: " + data);
+            console.log("attemping to reload the page"); 
+        }).then(
+            location.reload()
+        );
+    })
+</script>
