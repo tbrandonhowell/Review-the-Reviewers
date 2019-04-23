@@ -49,7 +49,9 @@ const scrapeReviews = (res) => {
     axios.get("https://pitchfork.com/reviews/albums/").then(response => {
 
         const $ = cheerio.load(response.data);
-    
+        
+        const promises = [];
+
         $("div.review").each((i, element) => {
     
             let newEntry = {}; // start our new DB entry
@@ -78,26 +80,35 @@ const scrapeReviews = (res) => {
             // console.log(newEntry);
 
             // GET THE SNIPPET & write to DB
-            axios.get(url).then(response => { // do a second axios call to the review URL and grab the snippet
-                const $ = cheerio.load(response.data);
-                newEntry.snippet = $("div.review-detail__abstract").children("p").text();
-                console.log("\n\nnewEntry:");
-                console.log(newEntry);
-                db.Reviews.create(newEntry)
-                    .then(inserted => {
-                        console.log("New review saved to DB:");
-                        console.log(inserted);
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
-            });
+            promises.push(new Promise((resolve, reject) => {
+                axios.get(url).then(response => { // do a second axios call to the review URL and grab the snippet
+                    const $ = cheerio.load(response.data);
+                    newEntry.snippet = $("div.review-detail__abstract").children("p").text();
+                    // console.log("\n\nnewEntry:");
+                    // console.log(newEntry);
+    
+                    db.Reviews.create(newEntry)
+                        .then(inserted => {
+                            console.log("New review saved to DB:");
+                            console.log(inserted);
+                            resolve('Finished')
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            resolve('err happened')
+                        })
+                    
+                });
+            }))
+            
         
         }); // close cheerio loop through review divs
-
+        Promise.all(promises).then(promiseResults => {
+            console.log(promiseResults, 'promise results')
+            res.send('Done')
+        })
     }); // close axios .then()
     
-    res.send("Scrape Complete");
 }
 // =================================
 
