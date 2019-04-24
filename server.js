@@ -14,7 +14,6 @@ const app = express(); // initialize express
 app.engine('handlebars', exphbs({defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 app.use(express.static('public')); // establish public folder
-// TODO: 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 // =================================
@@ -99,7 +98,7 @@ const scrapeReviews = (res) => {
                         })
                     
                 });
-            }))
+            })) // close push of new Promise
             
         
         }); // close cheerio loop through review divs
@@ -109,7 +108,7 @@ const scrapeReviews = (res) => {
         })
     }); // close axios .then()
     
-}
+} // close function
 // =================================
 
 // =================================

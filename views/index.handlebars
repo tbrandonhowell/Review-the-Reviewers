@@ -1,12 +1,12 @@
-<h1>Review the Review</h1>
+<h1>Review the Reviews</h1>
 
 <p>Leave a review of a pretentious review. Feel free to be pretentious yourself.</p>
 
 <h2>Latest Pitchfork Reviews:</h2>
 
-<p>Reviews looking a little stale?</p>
+<p>Reviews looking a little stale? <button id="pullFreshReviews">Click to pull the latest Pitchfork Reviews</button></p>
 
-<button id="pullFreshReviews">Click to pull the latest Pitchfork Reviews</button>
+
 
 {{#each reviews}}
 <div style="border: 1px solid #000000">
@@ -14,8 +14,10 @@
     <p><em>&quot;{{this.snippet}}&quot;</em></p>
     <p>by: {{this.author}}</p>
     <p><a href="{{this.url}}">Read Original Review</a></p>
-    <p><a href="/reviews/{{this._id}}">See Reviews of Review</a></p>
-    <p><a href="/leave-review/{{this._id}}">Leave a Review of Review</a></p>
+    {{#if this.comments}}
+        <p><a href="/reviews/{{this._id}}">See Reviews of this Review</a></p>
+    {{/if}}
+    <p><a href="/leave-review/{{this._id}}">Leave a Review of this Review</a></p>
 </div>
 
 {{/each}}
