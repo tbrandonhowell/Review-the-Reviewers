@@ -26,7 +26,8 @@ app.use(express.json());
 // =================================
 // DATABASE
 const db = require("./models");
-mongoose.connect("mongodb://localhost/mongoHomework", { useNewUrlParser: true });
+let MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHomework"
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 // =================================
 
 // =================================
@@ -100,7 +101,6 @@ const scrapeReviews = (res) => {
                 });
             })) // close push of new Promise
             
-        
         }); // close cheerio loop through review divs
         Promise.all(promises).then(promiseResults => {
             console.log(promiseResults, 'promise results')
